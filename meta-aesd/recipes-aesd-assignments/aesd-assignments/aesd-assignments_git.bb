@@ -5,7 +5,7 @@ SRC_URI = "git://git@github.com/cu-ecen-aeld/assignments-3-and-later-Rishabh-180
 
 PV = "1.0+git${SRCPV}"
 
-SRCREV = "cb49bb0483f626d2633b0ae740f1c2bd20c31c62"
+SRCREV = "36789219f682d83db9535772ab774219ab11c170"
 
 S = "${WORKDIR}/git/server"
 
