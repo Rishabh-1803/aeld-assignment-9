@@ -14,6 +14,11 @@ FILES:${PN} += "${sysconfdir}/init.d/S99aesdsocket"
 
 TARGET_LDFLAGS += "-pthread -lrt"
 
+inherit update-rc.d
+
+INITSCRIPT_NAME = "S99aesdsocket"
+INITSCRIPT_PARAMS = "defaults 99"
+
 do_configure() {
     :
 }
