@@ -1,0 +1,68 @@
+#!/bin/sh
+
+MODULE="scull"
+DEVICE="scull"
+
+case "$1" in
+    start)
+        echo "Loading $MODULE module"
+
+        modprobe $MODULE || exit 1
+
+        major=$(awk "\$2==\"$MODULE\" {print \$1}" /proc/devices)
+
+        if [ -z "$major" ]; then
+            echo "Could not determine major number for $MODULE"
+            exit 1
+        fi
+
+        rm -f /dev/scull0 /dev/scull1 /dev/scull2 /dev/scull3
+        rm -f /dev/scullpipe0 /dev/scullpipe1 /dev/scullpipe2 /dev/scullpipe3
+        rm -f /dev/scullsingle /dev/sculluid /dev/scullwuid /dev/scullpriv
+
+        mknod /dev/scull0 c $major 0
+        mknod /dev/scull1 c $major 1
+        mknod /dev/scull2 c $major 2
+        mknod /dev/scull3 c $major 3
+
+        mknod /dev/scullpipe0 c $major 4
+        mknod /dev/scullpipe1 c $major 5
+        mknod /dev/scullpipe2 c $major 6
+        mknod /dev/scullpipe3 c $major 7
+
+        mknod /dev/scullsingle c $major 8
+        mknod /dev/sculluid c $major 9
+        mknod /dev/scullwuid c $major 10
+        mknod /dev/scullpriv c $major 11
+
+        chmod 0664 /dev/scull0 /dev/scull1 /dev/scull2 /dev/scull3
+        chmod 0664 /dev/scullpipe0 /dev/scullpipe1 /dev/scullpipe2 /dev/scullpipe3
+        chmod 0664 /dev/scullsingle /dev/sculluid /dev/scullwuid /dev/scullpriv
+
+        echo "$MODULE loaded"
+        ;;
+
+    stop)
+        echo "Unloading $MODULE module"
+
+        rm -f /dev/scull0 /dev/scull1 /dev/scull2 /dev/scull3
+        rm -f /dev/scullpipe0 /dev/scullpipe1 /dev/scullpipe2 /dev/scullpipe3
+        rm -f /dev/scullsingle /dev/sculluid /dev/scullwuid /dev/scullpriv
+
+        rmmod $MODULE 2>/dev/null || true
+
+        echo "$MODULE unloaded"
+        ;;
+
+    restart)
+        $0 stop
+        $0 start
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
