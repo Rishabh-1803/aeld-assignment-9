@@ -6,7 +6,7 @@ case "$1" in
 
         # Load misc modules
         modprobe hello
-        modprobe faulty
+        insmod /lib/modules/$(uname -r)/extra/faulty.ko
 
         # Load scull
         modprobe scull || exit 1
