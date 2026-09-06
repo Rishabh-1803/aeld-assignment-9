@@ -5,7 +5,7 @@ SRC_URI = "git://git@github.com/cu-ecen-aeld/assignments-3-and-later-Rishabh-180
 
 PV = "1.0+git${SRCPV}"
 
-SRCREV = "36789219f682d83db9535772ab774219ab11c170"
+SRCREV = "d39eb420c360c42ee75797162fd99fd61a5bd79a"
 
 S = "${WORKDIR}/git/server"
 
@@ -13,6 +13,7 @@ FILES:${PN} += "${bindir}/aesdsocket"
 FILES:${PN} += "${sysconfdir}/init.d/S99aesdsocket"
 
 TARGET_LDFLAGS += "-pthread -lrt"
+EXTRA_OEMAKE += "USE_AESD_CHAR_DEVICE=1"
 
 inherit update-rc.d
 

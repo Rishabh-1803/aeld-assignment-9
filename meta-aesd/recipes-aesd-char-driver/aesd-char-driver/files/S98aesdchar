@@ -1,0 +1,44 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "Loading aesdchar"
+
+        if ! lsmod | grep -q '^aesdchar'; then
+            modprobe aesdchar
+        fi
+
+        major=$(awk '$2 == "aesdchar" {print $1}' /proc/devices)
+
+        if [ -z "$major" ]; then
+            echo "Unable to determine aesdchar major number"
+            exit 1
+        fi
+
+        rm -f /dev/aesdchar
+        mknod /dev/aesdchar c "$major" 0
+        chmod 0664 /dev/aesdchar
+
+        if getent group staff >/dev/null 2>&1; then
+            chgrp staff /dev/aesdchar
+        fi
+        ;;
+
+    stop)
+        echo "Unloading aesdchar"
+        rm -f /dev/aesdchar
+        modprobe -r aesdchar
+        ;;
+
+    restart)
+        "$0" stop
+        "$0" start
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0
