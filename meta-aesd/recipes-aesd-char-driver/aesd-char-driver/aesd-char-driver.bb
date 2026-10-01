@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171d
 SRC_URI = "git://git@github.com/cu-ecen-aeld/assignments-3-and-later-Rishabh-1803.git;protocol=ssh;branch=master \
            file://S98aesdchar"
 
-SRCREV = "d39eb420c360c42ee75797162fd99fd61a5bd79a"
+SRCREV = "58532b6"
 
 PV = "1.0+git${SRCPV}"
 
