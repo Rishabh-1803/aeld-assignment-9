@@ -7,7 +7,7 @@ on:
             - '*'
 jobs:
       full-test:
-        runs-on: self-hosted
+        runs-on: [self-hosted, Linux, ARM64]
         steps:
           - uses: actions/checkout@v3
             with:
@@ -20,6 +20,7 @@ jobs:
             timeout-minutes: 600
             run: |
                docker run --rm \
+                 --platform linux/amd64 \
                  -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
                  -e GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
@@ -34,6 +35,7 @@ jobs:
             timeout-minutes: 15
             run: |
                docker run --rm \
+                 --platform linux/amd64 \
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
                  cuaesd/aesd-autotest:assignment6-yocto \
                  --workdir=${GITHUB_WORKSPACE} \
