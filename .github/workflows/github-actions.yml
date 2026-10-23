@@ -8,7 +8,7 @@ on:
 jobs:
       full-test:
         runs-on: [self-hosted, Linux, ARM64]
-	timeout-minutes: 7200
+        timeout-minutes: 7200
         steps:
           - uses: actions/checkout@v3
             with:
