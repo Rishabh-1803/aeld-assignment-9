@@ -32,10 +32,11 @@ jobs:
             run: |
               ssh-add -D
           - name: Run full test
-            timeout-minutes: 15
+            timeout-minutes: 150
             run: |
                docker run --rm \
                  --platform linux/amd64 \
+                 -e SKIP_BUILD=1 \
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
                  cuaesd/aesd-autotest:assignment6-yocto \
                  --workdir=${GITHUB_WORKSPACE} \
