@@ -1,43 +1,55 @@
 name: assignment-test
+
 on:
-    push:
-        tags-ignore:
-            - '*'
-        branches:
-            - '*'
+  push:
+    tags-ignore:
+      - '*'
+    branches:
+      - '*'
+
 jobs:
-      full-test:
-        runs-on: [self-hosted, Linux, ARM64]
-        timeout-minutes: 7200
-        steps:
-          - uses: actions/checkout@v3
-            with:
-              clean: false
-              submodules: 'recursive'
-          - uses: webfactory/ssh-agent@v0.5.4
-            with:
-                 ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          - name: Run build
-            run: |
-               docker run --rm \
-                 --platform linux/amd64 \
-                 -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
-                 -e GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
-                 -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
-                 cuaesd/aesd-autotest:24-assignment6-yocto \
-                 --workdir=${GITHUB_WORKSPACE} \
-                 ./build.sh
-          - name: Cleanup
-            if: always()
-            run: |
-              ssh-add -D
-          - name: Run full test
-            timeout-minutes: 150
-            run: |
-               docker run --rm \
-                 --platform linux/amd64 \
-                 -e SKIP_BUILD=1 \
-                 -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
-                 cuaesd/aesd-autotest:assignment6-yocto \
-                 --workdir=${GITHUB_WORKSPACE} \
-                 ./full-test.sh
+  full-test:
+    runs-on: [self-hosted, Linux, ARM64]
+    timeout-minutes: 7200
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          clean: false
+          submodules: 'recursive'
+
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run build
+        run: |
+          docker run --rm \
+            --platform linux/amd64 \
+            -v "$SSH_AUTH_SOCK:/ssh-agent" -e SSH_AUTH_SOCK=/ssh-agent \
+            -e GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
+            -v "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
+            cuaesd/aesd-autotest:24-assignment6-yocto \
+            --workdir="${GITHUB_WORKSPACE}" \
+            ./build.sh
+
+      - name: Cleanup
+        if: always()
+        run: |
+          ssh-add -D
+
+      - name: Verify native ARM64 QEMU
+        run: |
+          uname -m
+          test -x /usr/bin/qemu-system-aarch64
+          /usr/bin/qemu-system-aarch64 --version
+
+      - name: Run full test on native ARM64 host
+        timeout-minutes: 150
+        env:
+          SKIP_BUILD: "1"
+          DO_VALIDATE: "1"
+          TERM: xterm
+        run: |
+          set -o pipefail
+          ./full-test.sh 2>&1 | tee "$RUNNER_TEMP/assignment9-full-test.log"
